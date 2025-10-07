@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+### Firebase Authentication
 
-## Getting Started
+- **Email/Password** автентифікація
+- **Google OAuth** підтримка
+- **Безпечні сесії** з Firebase Auth
+- **Автоматичне перенаправлення** для неавторизованих користувачів
 
-First, run the development server:
+### Firestore Database
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Real-time** синхронізація даних
+- **Колекція items** з полями `title`, `description`, `createdAt`
+- **CRUD операції** (створення, читання, видалення)
+- **Автоматичні ID** та timestamps
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Захищені маршрути
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Middleware** для захисту маршрутів
+- **Client-side** перевірка автентифікації
+- **Автоматичне перенаправлення** на `/login`
+- **Захищений dashboard** тільки для авторизованих
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### UI/UX
 
-## Learn More
+- **Tailwind CSS** для стилізації
 
-To learn more about Next.js, take a look at the following resources:
+--------- Функціональність ---------
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Для неавторизованих користувачів:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Перегляд початкового екрану
+- Реєстрація нового акаунту
+- Вхід в існуючий акаунт
+- Google OAuth автентифікація
 
-## Deploy on Vercel
+### Для авторизованих користувачів:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Доступ до dashboard
+- Перегляд інформації акаунту
+- Додавання нових items
+- Перегляд списку items
+- Видалення items
+- Вихід з акаунту
