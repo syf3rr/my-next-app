@@ -2,19 +2,30 @@
 
 import React, { useState, useEffect } from "react";
 import { subscribeToItems, deleteItem, Item } from "../firebase/firestore";
+import { useAuth } from "../contexts/authContext";
 
 const ItemsList: React.FC = () => {
+  const { currentUser } = useAuth();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const unsubscribe = subscribeToItems((itemsData: Item[]) => {
-      setItems(itemsData);
+    if (!currentUser) {
+      setItems([]);
       setLoading(false);
-    });
+      return;
+    }
+
+    const unsubscribe = subscribeToItems(
+      currentUser.uid,
+      (itemsData: Item[]) => {
+        setItems(itemsData);
+        setLoading(false);
+      }
+    );
 
     return () => unsubscribe();
-  }, []);
+  }, [currentUser]);
 
   const handleDelete = async (id: string): Promise<void> => {
     if (window.confirm("Are you sure you want to delete this item?")) {

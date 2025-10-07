@@ -7,8 +7,8 @@ import {
   updateDoc,
   deleteDoc,
   query,
-  orderBy,
   onSnapshot,
+  where,
   DocumentData,
   QuerySnapshot,
   Unsubscribe,
@@ -21,6 +21,7 @@ export interface Item {
   id: string;
   title: string;
   description: string;
+  userId: string;
   createdAt: Date;
   updatedAt?: Date;
 }
@@ -28,6 +29,7 @@ export interface Item {
 export interface ItemInput {
   title: string;
   description: string;
+  userId: string;
   createdAt: Date;
 }
 
@@ -37,7 +39,8 @@ export const itemsCollection = "items";
 // Add a new item
 export const addItem = async (
   title: string,
-  description: string
+  description: string,
+  userId: string
 ): Promise<string> => {
   try {
     const docRef: DocumentReference<DocumentData> = await addDoc(
@@ -45,6 +48,7 @@ export const addItem = async (
       {
         title,
         description,
+        userId,
         createdAt: new Date(),
       }
     );
@@ -55,12 +59,12 @@ export const addItem = async (
   }
 };
 
-// Get all items
-export const getItems = async (): Promise<Item[]> => {
+// Get items for a specific user
+export const getItems = async (userId: string): Promise<Item[]> => {
   try {
     const q: Query<DocumentData> = query(
       collection(db, itemsCollection),
-      orderBy("createdAt", "desc")
+      where("userId", "==", userId)
     );
     const querySnapshot: QuerySnapshot<DocumentData> = await getDocs(q);
     const items: Item[] = [];
@@ -70,11 +74,13 @@ export const getItems = async (): Promise<Item[]> => {
         id: doc.id,
         title: data.title,
         description: data.description,
+        userId: data.userId,
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate(),
       });
     });
-    return items;
+    // Sort in JavaScript instead of Firestore
+    return items.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   } catch (error) {
     console.error("Error getting items: ", error);
     throw error;
@@ -110,13 +116,14 @@ export const deleteItem = async (id: string): Promise<void> => {
   }
 };
 
-// Real-time listener for items
+// Real-time listener for items for a specific user
 export const subscribeToItems = (
+  userId: string,
   callback: (items: Item[]) => void
 ): Unsubscribe => {
   const q: Query<DocumentData> = query(
     collection(db, itemsCollection),
-    orderBy("createdAt", "desc")
+    where("userId", "==", userId)
   );
   return onSnapshot(q, (querySnapshot: QuerySnapshot<DocumentData>) => {
     const items: Item[] = [];
@@ -126,10 +133,15 @@ export const subscribeToItems = (
         id: doc.id,
         title: data.title,
         description: data.description,
+        userId: data.userId,
         createdAt: data.createdAt?.toDate() || new Date(),
         updatedAt: data.updatedAt?.toDate(),
       });
     });
-    callback(items);
+    // Sort in JavaScript instead of Firestore
+    const sortedItems = items.sort(
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+    );
+    callback(sortedItems);
   });
 };

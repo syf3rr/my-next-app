@@ -2,8 +2,10 @@
 
 import React, { useState, FormEvent, ChangeEvent } from "react";
 import { addItem } from "../firebase/firestore";
+import { useAuth } from "../contexts/authContext";
 
 const AddItemForm: React.FC = () => {
+  const { currentUser } = useAuth();
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -11,6 +13,11 @@ const AddItemForm: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+
+    if (!currentUser) {
+      setError("You must be logged in to add items");
+      return;
+    }
 
     if (!title.trim() || !description.trim()) {
       setError("Please fill in all fields");
@@ -21,7 +28,7 @@ const AddItemForm: React.FC = () => {
     setError("");
 
     try {
-      await addItem(title.trim(), description.trim());
+      await addItem(title.trim(), description.trim(), currentUser.uid);
       setTitle("");
       setDescription("");
       // Success - form will reset
